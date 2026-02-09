@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/01-lista/01-lista.iml" filepath="$PROJECT_DIR$/01-lista/01-lista.iml" />
+      <module fileurl="file://$PROJECT_DIR$/02-TAD-ListaDoblementeEnlazada/02-TAD-ListaDoblementeEnlazada.iml" filepath="$PROJECT_DIR$/02-TAD-ListaDoblementeEnlazada/02-TAD-ListaDoblementeEnlazada.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/ESTRUCTURA_DE_DATOS_JAVA_EAN.iml" filepath="$PROJECT_DIR$/.idea/ESTRUCTURA_DE_DATOS_JAVA_EAN.iml" />
+    </modules>
+  </component>
+</project>
