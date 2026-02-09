@@ -1,1 +1,9 @@
 /01-lista/TAD-Lista/nbproject/private/
+# IntelliJ
+.idea/
+*.iml
+
+# Java
+out/
+target/
+build/
