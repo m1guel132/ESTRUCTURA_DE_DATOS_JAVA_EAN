@@ -60,6 +60,53 @@ public class Principal {
 
         } while (opcion != 0);
     }
+
+    private static void ejecutarListaNormalConCentinela(Scanner sc) {
+        ListaDoblementeEnlazadaConCentinela lista = new ListaDoblementeEnlazadaConCentinela();
+        int opcion;
+
+        do {
+            System.out.println("\n--- Lista doblemente enlazada ---");
+            System.out.println("1. Insertar");
+            System.out.println("2. Buscar");
+            System.out.println("3. Eliminar");
+            System.out.println("4. Recorrer");
+            System.out.println("0. Salir");
+            System.out.print("Opción: ");
+            opcion = sc.nextInt();
+
+            switch (opcion) {
+                case 1:
+                    System.out.print("Valor a insertar: ");
+                    lista.insertar(sc.nextInt());
+                    break;
+
+                case 2:
+                    System.out.print("Valor a buscar: ");
+                    Nodo encontrado = lista.search(sc.nextInt());
+                    System.out.println(encontrado != null
+                            ? "Nodo encontrado"
+                            : "Nodo no encontrado");
+                    break;
+
+                case 3:
+                    System.out.print("Valor a eliminar: ");
+                    Nodo eliminar = lista.search(sc.nextInt());
+                    if (eliminar != null) {
+                        lista.delete(eliminar);
+                        System.out.println("Nodo eliminado");
+                    } else {
+                        System.out.println("Nodo no encontrado");
+                    }
+                    break;
+
+                case 4:
+                    lista.recorrer();
+                    break;
+            }
+
+        } while (opcion != 0);
+    }
     
     // ================= LISTA CON CENTINELA =================
     private static void ejecutarListaCentinela(Scanner sc) {
@@ -115,6 +162,7 @@ public class Principal {
         System.out.println("Seleccione el tipo de lista:");
         System.out.println("1. Lista doblemente enlazada (sin centinela)");
         System.out.println("2. Lista doblemente enlazada (con centinela)");
+        System.out.println("3. Lista doblemente enlazada con centinela");
         System.out.print("Opción: ");
         int opcion = sc.nextInt();
 
@@ -125,6 +173,8 @@ public class Principal {
             case 2:
                 ejecutarListaCentinela(sc);
                 break;
+            case 3:
+                ejecutarListaNormalConCentinela(sc);
             default:
                 System.out.println("Opción no válida");
         }

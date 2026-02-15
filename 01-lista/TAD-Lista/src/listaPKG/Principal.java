@@ -63,18 +63,43 @@ public class Principal {
         System.out.println("Después de eliminar 20: " + lista.obtenerLista());
 
     }
+
+    public static void invocarListaSimple_a_pila(){
+        ListaSimpleEnlazada_a_Pila lista = new ListaSimpleEnlazada_a_Pila();
+        lista.agregarNodo(10);
+        System.out.println("Lista: " + lista.obtenerLista());
+
+        lista.agregarNodo(20);
+        System.out.println("Lista: " + lista.obtenerLista());
+
+        lista.agregarNodo(30);
+        System.out.println("Lista: " + lista.obtenerLista());
+
+        System.out.println("Buscar: " + lista.buscarNodo(20));
+
+        lista.eliminarNodo();
+        System.out.println("Después de eliminar : " + lista.obtenerLista());
+
+        lista.eliminarNodo();
+        System.out.println("Después de eliminar : " + lista.obtenerLista());
+
+        lista.agregarNodo(100);
+        System.out.println("Lista: " + lista.obtenerLista());
+
+    }
     
     
     public static void main(String[] args) {
         // TODO code application logic here
         Scanner entrada=new Scanner(System.in);
         System.out.println("Que tipo de Estructura "
-                + "desea invocar?\n1. Pila\n2. Cola\n3. Lista simplemente enlazada");
+                + "desea invocar?\n1. Pila\n2. Cola\n3. Lista simplemente enlazada \n4. Lista a pila");
         int seleccion=entrada.nextInt();
         switch (seleccion) {
             case 1 -> invocarFila();
             case 2 -> invocarPila();
             case 3 -> invocarListaSimple();
+            case 4 -> invocarListaSimple_a_pila();
             default -> System.out.println("No está definido!");
         }
     }   
