@@ -56,7 +56,14 @@ public class Controlador implements ActionListener, BasicPlayerListener{
                 if (carpeta != null) {
                     try {
                         // 1. Esto dispara el método opened(source, properties) automáicamente
-                        modelo.cargarCarpeta(carpeta); 
+                        modelo.cargarCarpeta(carpeta);
+                        
+                        vista.modeloLista.clear();
+                        
+                        for (File archivo : modelo.obtenerCanciones()) {
+                            vista.modeloLista.addElement(archivo.getName());
+                        }
+                            
                         if (!modelo.estaVacia()) {
                             modelo.reproducir();
                         }

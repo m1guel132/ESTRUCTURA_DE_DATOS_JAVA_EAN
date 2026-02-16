@@ -5,6 +5,7 @@
 package modelo;
 
 import java.io.File;
+import java.util.List;
 import javazoom.jlgui.basicplayer.BasicPlayer;
 import javazoom.jlgui.basicplayer.BasicPlayerListener;
 
@@ -103,6 +104,10 @@ public class ReproductorModelo {
     
     public boolean estaVacia() {
         return playlist.estaVacia();
+    }
+    
+    public List<File> obtenerCanciones() {
+        return playlist.obtenerTodas();
     }
 
     public void setRuta(File rutaArchivo) {

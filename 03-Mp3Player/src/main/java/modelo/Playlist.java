@@ -5,6 +5,8 @@
 package modelo;
 
 import java.io.File;
+import java.util.List;
+import java.util.ArrayList;
 
 /**
  *
@@ -61,5 +63,18 @@ public class Playlist {
     public void limpiar() {
         head = null;
         actual = null;
+    }
+    
+    public List<File> obtenerTodas() {
+        
+        List<File> lista = new ArrayList<>();
+        Nodo temp = head;
+        
+        while (temp != null) {
+            lista.add(temp.cancion);
+            temp = temp.next;
+        }
+        
+        return lista;
     }
 }
