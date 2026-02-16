@@ -27,11 +27,17 @@ public class ReproductorVista extends JFrame{
     public JLabel lblArtista = new JLabel("Artista: -");
     public JLabel lblAlbum = new JLabel("Álbum: -");
     
+    /*
     public JButton btnPlay = new JButton("Reproducr");
     public JButton btnPausa = new JButton("Pausar");
     public JButton btnStop = new JButton("Detener");
+    */
+    public JButton btnControl = new JButton("reproducir");
+    public JButton btnSiguiente = new JButton("Siguiente");
+    public JButton btnAnterior = new JButton("Anterior");
     public JButton btnAbrir = new JButton("Abrir archivo");
 
+    
     
     public ReproductorVista() {
         super("Mp3 en JAVA!");
@@ -63,9 +69,9 @@ public class ReproductorVista extends JFrame{
         // --- PANEL DE BOTONES (ABAJO) ---
         JPanel panelBotones = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 10));
         panelBotones.add(btnAbrir);
-        panelBotones.add(btnPlay);
-        panelBotones.add(btnPausa);
-        panelBotones.add(btnStop);
+        panelBotones.add(btnAnterior);
+        panelBotones.add(btnControl);
+        panelBotones.add(btnSiguiente);
 
         // AGREGAR TODO AL FRAME PRINCIPAL
         this.add(panelInfo, BorderLayout.NORTH);

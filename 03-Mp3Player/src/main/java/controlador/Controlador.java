@@ -4,6 +4,7 @@
  */
 package controlador;
 
+import java.io.File;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Map;
@@ -23,7 +24,8 @@ public class Controlador implements ActionListener, BasicPlayerListener{
     
     private ReproductorModelo modelo;
     private ReproductorVista vista;
-    private boolean estaPausado=false;
+    private Estado estadoActual = Estado.stop;
+    //private boolean estaPausado=false;
     private long tamanoArchivo;
     
     //Constructor
@@ -34,46 +36,59 @@ public class Controlador implements ActionListener, BasicPlayerListener{
         this.modelo.setControlador(this); // Activar eventos de la librería de audio para que pueda funcionar la barra de progreso
         
         //Agregando Eventos
-        this.vista.btnPlay.addActionListener(this);
-        this.vista.btnPausa.addActionListener(this);
-        this.vista.btnStop.addActionListener(this);
+        this.vista.btnControl.addActionListener(this);
+        this.vista.btnSiguiente.addActionListener(this);
+        this.vista.btnAnterior.addActionListener(this);
         this.vista.btnAbrir.addActionListener(this);
     }
+    
+    private enum Estado {
+        stop,
+        play,
+        pause
+    };
 
     @Override
     public void actionPerformed(ActionEvent e) {
         try {
             if (e.getSource() == vista.btnAbrir) {
-                String rutaArchivo = seleccionarArchivo();
-                if (rutaArchivo != null) {
+                File carpeta = seleccionarCarpeta();
+                if (carpeta != null) {
                     try {
                         // 1. Esto dispara el método opened(source, properties) automáicamente
-                        modelo.setRuta(rutaArchivo); 
-                        modelo.reproducir();
-                        estaPausado = false;
+                        modelo.cargarCarpeta(carpeta); 
+                        if (!modelo.estaVacia()) {
+                            modelo.reproducir();
+                        }
                     } catch (Exception ex) {
                         JOptionPane.showMessageDialog(vista, "Error al abrir el archivo: " + ex.getMessage());
                     }
                 }
             } 
-            else if (e.getSource() == vista.btnPlay) {
-                if (estaPausado) {
-                    modelo.reanudar();
-                    estaPausado = false;
-                }else{
-                    modelo.reproducir();
-                    estaPausado = false;
+            else if (e.getSource() == vista.btnControl) {
+                switch (estadoActual) {
+                    
+                    case stop -> {
+                        modelo.reproducir();
+                        estadoActual = Estado.play;
+                    }
+                        
+                    case play -> {
+                        modelo.pausar();
+                        estadoActual = Estado.pause;
+                    }
+                      
+                    case pause -> {
+                        modelo.reanudar();
+                        estadoActual = Estado.play;
+                    }                   
                 }
-                
-            } 
-            else if (e.getSource() == vista.btnPausa) {
-                modelo.pausar();
-                estaPausado = true;
-            } 
-            else if (e.getSource() == vista.btnStop) {
-                modelo.detener();
-                limpiarLabels();
-                estaPausado = false;
+            }
+            else if (e.getSource() == vista.btnSiguiente) {
+                modelo.siguiente();
+            }
+            else if (e.getSource() == vista.btnAnterior) {
+                modelo.anterior();
             }
         } catch (Exception ex) {
             JOptionPane.showMessageDialog(vista, "Error: " + ex.getMessage());
@@ -81,15 +96,18 @@ public class Controlador implements ActionListener, BasicPlayerListener{
     }
     
     //Método empleado para seleccionar el archivo, retorna la ruta como un string
-    public String seleccionarArchivo() {
+    public File seleccionarCarpeta () {
         JFileChooser fileChooser = new JFileChooser();
-        // Filtro para que solo se vean archivos MP3
-        fileChooser.setFileFilter(new javax.swing.filechooser.FileNameExtensionFilter("Archivos MP3", "mp3"));
+        
+        fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+        fileChooser.setAcceptAllFileFilterUsed(false);
+        
         int seleccion = fileChooser.showOpenDialog(vista);
         
         if (seleccion == JFileChooser.APPROVE_OPTION) {
-            return fileChooser.getSelectedFile().getAbsolutePath();
+            return fileChooser.getSelectedFile();
         }
+        
         return null;
     }
 
@@ -132,7 +150,6 @@ public class Controlador implements ActionListener, BasicPlayerListener{
     @Override
     public void stateUpdated(BasicPlayerEvent bpe) {
         if (bpe.getCode() == BasicPlayerEvent.STOPPED) {
-            estaPausado = false;
             vista.barraProgreso.setValue(0);
         }
     }
