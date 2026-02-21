@@ -31,6 +31,8 @@ public class ReproductorVista extends JFrame{
     public JLabel lblTitulo = new JLabel("Título: -");
     public JLabel lblArtista = new JLabel("Artista: -");
     public JLabel lblAlbum = new JLabel("Álbum: -");
+    public JLabel lblDuracion = new JLabel("Duracion: -");
+    public JLabel lblGenero = new JLabel("Genero: -");
     public DefaultListModel<String> modeloLista = new DefaultListModel<>();
     public JList<String> listaCanciones = new JList<>(modeloLista);
     
@@ -60,12 +62,19 @@ public class ReproductorVista extends JFrame{
         lblTitulo.setAlignmentX(Component.CENTER_ALIGNMENT);
         lblArtista.setAlignmentX(Component.CENTER_ALIGNMENT);
         lblAlbum.setAlignmentX(Component.CENTER_ALIGNMENT);
+        lblDuracion.setAlignmentX(Component.CENTER_ALIGNMENT);
+        lblGenero.setAlignmentX(Component.CENTER_ALIGNMENT);
     
         panelInfo.add(lblTitulo);
         panelInfo.add(Box.createVerticalStrut(5)); // Espacio entre l�neas
         panelInfo.add(lblArtista);
         panelInfo.add(Box.createVerticalStrut(5));
         panelInfo.add(lblAlbum);
+        panelInfo.add(Box.createVerticalStrut(5));
+        panelInfo.add(lblGenero);
+        panelInfo.add(Box.createVerticalStrut(5));
+        panelInfo.add(lblDuracion);
+        ;
 
         // --- PANEL CENTRAL (BARRA DE PROGRESO) ---
         JPanel panelProgreso = new JPanel(new BorderLayout());

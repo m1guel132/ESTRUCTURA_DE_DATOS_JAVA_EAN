@@ -114,7 +114,7 @@ public class Controlador implements ActionListener, BasicPlayerListener{
         if (seleccion == JFileChooser.APPROVE_OPTION) {
             return fileChooser.getSelectedFile();
         }
-        
+
         return null;
     }
 
@@ -124,12 +124,28 @@ public class Controlador implements ActionListener, BasicPlayerListener{
     String titulo = obtenerPropiedad(properties, "title", "Desconocido");
     String artista = obtenerPropiedad(properties, "author", "Desconocido");
     String album = obtenerPropiedad(properties, "album", "Desconocido");
+    String genero = obtenerPropiedad(properties, "mp3.id3tag.genre", "Desconocido");
 
     // Actualizamos la vista
     vista.lblTitulo.setText("Título: " + titulo);
     vista.lblArtista.setText("Artista: " + artista);
     vista.lblAlbum.setText("Álbum: " + album);
+    vista.lblGenero.setText("Genero: " + genero);
+    
+    if (properties.containsKey("duration")) {
+        long microsegundos = Long.parseLong(properties.get("duration").toString());
+        
+        long segundosTotales = microsegundos / 1_000_000;
+        long minutos = segundosTotales / 60;
+        long segundos = segundosTotales % 60;
+        
+        
+        vista.lblDuracion.setText(
+            "Duración: " + String.format("%02d:%02d", minutos, segundos)
+        );
 
+    }
+    
     if (properties.containsKey("audio.length.bytes")) {
         tamanoArchivo = Long.parseLong(properties.get("audio.length.bytes").toString());
     }
@@ -177,6 +193,8 @@ public class Controlador implements ActionListener, BasicPlayerListener{
         vista.lblTitulo.setText("Título: -");
         vista.lblArtista.setText("Artista: -");
         vista.lblAlbum.setText("Álbum: -");
+        vista.lblGenero.setText("Genero: -");
+        vista.lblDuracion.setText("Duracion: -");
         vista.barraProgreso.setValue(0);
         vista.barraProgreso.setString("00:00");
     }
