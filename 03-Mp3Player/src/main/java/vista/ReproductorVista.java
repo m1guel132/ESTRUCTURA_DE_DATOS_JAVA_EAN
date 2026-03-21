@@ -59,11 +59,11 @@ public class ReproductorVista extends JFrame{
         panelInfo.setLayout(new BoxLayout(panelInfo, BoxLayout.Y_AXIS));
         panelInfo.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
     
-        lblTitulo.setAlignmentX(Component.CENTER_ALIGNMENT);
-        lblArtista.setAlignmentX(Component.CENTER_ALIGNMENT);
-        lblAlbum.setAlignmentX(Component.CENTER_ALIGNMENT);
-        lblDuracion.setAlignmentX(Component.CENTER_ALIGNMENT);
-        lblGenero.setAlignmentX(Component.CENTER_ALIGNMENT);
+        lblTitulo.setAlignmentX(Component.RIGHT_ALIGNMENT);
+        lblArtista.setAlignmentX(Component.RIGHT_ALIGNMENT);
+        lblAlbum.setAlignmentX(Component.RIGHT_ALIGNMENT);
+        lblDuracion.setAlignmentX(Component.RIGHT_ALIGNMENT);
+        lblGenero.setAlignmentX(Component.RIGHT_ALIGNMENT);
     
         panelInfo.add(lblTitulo);
         panelInfo.add(Box.createVerticalStrut(5)); // Espacio entre l�neas
@@ -74,7 +74,6 @@ public class ReproductorVista extends JFrame{
         panelInfo.add(lblGenero);
         panelInfo.add(Box.createVerticalStrut(5));
         panelInfo.add(lblDuracion);
-        ;
 
         // --- PANEL CENTRAL (BARRA DE PROGRESO) ---
         JPanel panelProgreso = new JPanel(new BorderLayout());

@@ -65,16 +65,26 @@ public class Playlist {
         actual = null;
     }
     
-    public List<File> obtenerTodas() {
+    public File[] obtenerTodas() {
         
-        List<File> lista = new ArrayList<>();
+        int contador = 0;
         Nodo temp = head;
         
         while (temp != null) {
-            lista.add(temp.cancion);
+            contador++;
             temp = temp.next;
         }
         
-        return lista;
+        File[] arreglo = new File[contador];
+        
+        temp = head;
+        int i = 0;
+        
+        while (temp != null) {
+            arreglo[i++] = temp.cancion;
+            temp = temp.next;
+        }
+        
+        return arreglo;
     }
 }

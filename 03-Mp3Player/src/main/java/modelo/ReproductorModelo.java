@@ -106,7 +106,7 @@ public class ReproductorModelo {
         return playlist.estaVacia();
     }
     
-    public List<File> obtenerCanciones() {
+    public File[] obtenerCanciones() {
         return playlist.obtenerTodas();
     }
 
