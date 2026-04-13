@@ -109,7 +109,31 @@ public class ReproductorModelo {
     public File[] obtenerCanciones() {
         return playlist.obtenerTodas();
     }
-
+    
+    public void ordenarQuickSortNombre() {
+        File[] arr = playlist.obtenerTodas();
+        Ordenamiento.quickSortNombre(arr);
+        playlist.reordenar(arr);
+    }
+    
+    public void ordenarQuickSortDuracion() {
+        File[] arr = playlist.obtenerTodas();
+        Ordenamiento.quickSortDuracion(arr);
+        playlist.reordenar(arr);
+    }
+    
+    public void ordenarMergeSortNombre() {
+        File[] arr = playlist.obtenerTodas();
+        Ordenamiento.mergeSortNombre(arr);
+        playlist.reordenar(arr);
+    }
+    
+    public void ordenarMergeSortDuracion() {
+        File[] arr = playlist.obtenerTodas();
+        Ordenamiento.mergeSortDuracion(arr);
+        playlist.reordenar(arr);
+    }
+    
     public void setRuta(File rutaArchivo) {
         throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }

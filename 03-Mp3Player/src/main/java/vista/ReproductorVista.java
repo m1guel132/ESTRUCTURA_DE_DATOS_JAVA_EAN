@@ -45,8 +45,10 @@ public class ReproductorVista extends JFrame{
     public JButton btnSiguiente = new JButton("Siguiente");
     public JButton btnAnterior = new JButton("Anterior");
     public JButton btnAbrir = new JButton("Abrir archivo");
-
-    
+    public JButton btnQuickSortName = new JButton("Ordenar con Quick Sort por nombre");
+    public JButton btnQuickSortTime = new JButton("Ordenar con Quick Sort por duracion");
+    public JButton btnMergeSortName = new JButton("Ordenar con Mergue Sort por nombre");
+    public JButton btnMergeSortTime = new JButton("Ordenar con Mergue Sort por duracion");    
     
     public ReproductorVista() {
         super("Mp3 en JAVA!");
@@ -92,6 +94,10 @@ public class ReproductorVista extends JFrame{
         panelBotones.add(btnAnterior);
         panelBotones.add(btnControl);
         panelBotones.add(btnSiguiente);
+        panelBotones.add(btnQuickSortName);
+        panelBotones.add(btnQuickSortTime);
+        panelBotones.add(btnMergeSortName);
+        panelBotones.add(btnMergeSortTime);
 
         // AGREGAR TODO AL FRAME PRINCIPAL
         this.add(panelInfo, BorderLayout.NORTH);

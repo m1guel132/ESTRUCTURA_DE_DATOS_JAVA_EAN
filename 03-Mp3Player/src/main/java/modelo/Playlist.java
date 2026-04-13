@@ -87,4 +87,26 @@ public class Playlist {
         
         return arreglo;
     }
+    
+    public void reordenar(File[] ordenado) {
+    
+    head = null;
+    actual = null;
+
+    for (File f : ordenado) {
+        Nodo nuevo = new Nodo(f);
+        if (head == null) {
+            head = nuevo;
+            actual = head;
+        } else {
+            
+            Nodo temp = head;
+            while (temp.next != null) {
+                temp = temp.next;
+            }
+            temp.next = nuevo;
+            nuevo.prev = temp; 
+        }
+    }
+}
 }

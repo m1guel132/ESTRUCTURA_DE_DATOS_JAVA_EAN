@@ -40,6 +40,10 @@ public class Controlador implements ActionListener, BasicPlayerListener{
         this.vista.btnSiguiente.addActionListener(this);
         this.vista.btnAnterior.addActionListener(this);
         this.vista.btnAbrir.addActionListener(this);
+        this.vista.btnQuickSortName.addActionListener(this);
+        this.vista.btnQuickSortTime.addActionListener(this);
+        this.vista.btnMergeSortName.addActionListener(this);
+        this.vista.btnMergeSortTime.addActionListener(this);
     }
     
     private enum Estado {
@@ -96,6 +100,22 @@ public class Controlador implements ActionListener, BasicPlayerListener{
             }
             else if (e.getSource() == vista.btnAnterior) {
                 modelo.anterior();
+            }
+            else if (e.getSource() == vista.btnQuickSortName) {
+                modelo.ordenarQuickSortNombre();
+                refrescarLista();
+            }
+            else if (e.getSource() == vista.btnQuickSortTime) {
+                modelo.ordenarQuickSortDuracion();
+                refrescarLista();
+            }
+            else if (e.getSource() == vista.btnMergeSortName) {
+                modelo.ordenarMergeSortNombre();
+                refrescarLista();
+            }
+            else if (e.getSource() == vista.btnMergeSortTime) {
+                modelo.ordenarMergeSortDuracion();
+                refrescarLista();
             }
         } catch (Exception ex) {
             JOptionPane.showMessageDialog(vista, "Error: " + ex.getMessage());
@@ -198,4 +218,12 @@ public class Controlador implements ActionListener, BasicPlayerListener{
         vista.barraProgreso.setValue(0);
         vista.barraProgreso.setString("00:00");
     }
+    
+    private void refrescarLista() {
+    vista.modeloLista.clear();
+    for (File f : modelo.obtenerCanciones()) {
+        vista.modeloLista.addElement(f.getName());
+        System.out.println(">> " + f.getName() + " | " + f.length() + " bytes"); // debug
+    }
+}
 }
