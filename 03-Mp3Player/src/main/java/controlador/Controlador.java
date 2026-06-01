@@ -1,41 +1,47 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package controlador;
 
 import java.io.File;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.List;
 import java.util.Map;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
+import javax.swing.SwingWorker;
 import javazoom.jlgui.basicplayer.BasicController;
 import javazoom.jlgui.basicplayer.BasicPlayerEvent;
 import javazoom.jlgui.basicplayer.BasicPlayerListener;
+import modelo.MusicBrainzService;
+import modelo.MusicBrainzService.Recomendacion;
 import modelo.ReproductorModelo;
 import vista.ReproductorVista;
 
 /**
+ * Controlador MVC del reproductor MP3.
+ * Dispara búsquedas a MusicBrainz de forma asíncrona (SwingWorker)
+ * cada vez que abre una nueva canción.
  *
- * @author diotallevi
+ * @author diotallevi / migue
  */
-public class Controlador implements ActionListener, BasicPlayerListener{
-    
+public class Controlador implements ActionListener, BasicPlayerListener {
+
     private ReproductorModelo modelo;
-    private ReproductorVista vista;
+    private ReproductorVista  vista;
     private Estado estadoActual = Estado.stop;
-    //private boolean estaPausado=false;
-    private long tamanoArchivo;
-    
-    //Constructor
-    public Controlador (ReproductorModelo entradaObjetoModelo, ReproductorVista entradaObjetoVista){
-        this.modelo=entradaObjetoModelo;
-        this.vista=entradaObjetoVista;
-        
-        this.modelo.setControlador(this); // Activar eventos de la librería de audio para que pueda funcionar la barra de progreso
-        
-        //Agregando Eventos
+    private long   tamanoArchivo;
+
+    private final MusicBrainzService musicBrainz = new MusicBrainzService();
+    private String generoActual = "pop";
+
+    private enum Estado { stop, play, pause }
+
+    // ── Constructor ──────────────────────────────────────────────
+    public Controlador(ReproductorModelo entradaObjetoModelo, ReproductorVista entradaObjetoVista) {
+        this.modelo = entradaObjetoModelo;
+        this.vista  = entradaObjetoVista;
+
+        this.modelo.setControlador(this);
+
         this.vista.btnControl.addActionListener(this);
         this.vista.btnSiguiente.addActionListener(this);
         this.vista.btnAnterior.addActionListener(this);
@@ -44,14 +50,10 @@ public class Controlador implements ActionListener, BasicPlayerListener{
         this.vista.btnQuickSortTime.addActionListener(this);
         this.vista.btnMergeSortName.addActionListener(this);
         this.vista.btnMergeSortTime.addActionListener(this);
+        this.vista.btnBuscarRec.addActionListener(this);
     }
-    
-    private enum Estado {
-        stop,
-        play,
-        pause
-    };
 
+    // ── Eventos de botones ───────────────────────────────────────
     @Override
     public void actionPerformed(ActionEvent e) {
         try {
@@ -59,156 +61,138 @@ public class Controlador implements ActionListener, BasicPlayerListener{
                 File carpeta = seleccionarCarpeta();
                 if (carpeta != null) {
                     try {
-                        // 1. Esto dispara el método opened(source, properties) automáicamente
                         modelo.cargarCarpeta(carpeta);
-                        
                         vista.modeloLista.clear();
-                        
                         for (File archivo : modelo.obtenerCanciones()) {
                             vista.modeloLista.addElement(archivo.getName());
                         }
-                            
                         if (!modelo.estaVacia()) {
                             modelo.reproducir();
                         }
                     } catch (Exception ex) {
-                        JOptionPane.showMessageDialog(vista, "Error al abrir el archivo: " + ex.getMessage());
+                        JOptionPane.showMessageDialog(vista, "Error al abrir: " + ex.getMessage());
                     }
                 }
-            } 
+            }
             else if (e.getSource() == vista.btnControl) {
                 switch (estadoActual) {
-                    
-                    case stop -> {
-                        modelo.reproducir();
-                        estadoActual = Estado.play;
-                    }
-                        
-                    case play -> {
-                        modelo.pausar();
-                        estadoActual = Estado.pause;
-                    }
-                      
-                    case pause -> {
-                        modelo.reanudar();
-                        estadoActual = Estado.play;
-                    }                   
+                    case stop  -> { modelo.reproducir(); estadoActual = Estado.play;  vista.btnControl.setText("Pausar");    }
+                    case play  -> { modelo.pausar();     estadoActual = Estado.pause; vista.btnControl.setText("Reanudar"); }
+                    case pause -> { modelo.reanudar();   estadoActual = Estado.play;  vista.btnControl.setText("Pausar");    }
                 }
             }
-            else if (e.getSource() == vista.btnSiguiente) {
-                modelo.siguiente();
-            }
-            else if (e.getSource() == vista.btnAnterior) {
-                modelo.anterior();
-            }
-            else if (e.getSource() == vista.btnQuickSortName) {
-                modelo.ordenarQuickSortNombre();
-                refrescarLista();
-            }
-            else if (e.getSource() == vista.btnQuickSortTime) {
-                modelo.ordenarQuickSortDuracion();
-                refrescarLista();
-            }
-            else if (e.getSource() == vista.btnMergeSortName) {
-                modelo.ordenarMergeSortNombre();
-                refrescarLista();
-            }
-            else if (e.getSource() == vista.btnMergeSortTime) {
-                modelo.ordenarMergeSortDuracion();
-                refrescarLista();
-            }
+            else if (e.getSource() == vista.btnSiguiente)    { modelo.siguiente(); }
+            else if (e.getSource() == vista.btnAnterior)     { modelo.anterior();  }
+            else if (e.getSource() == vista.btnQuickSortName){ modelo.ordenarQuickSortNombre();   refrescarLista(); }
+            else if (e.getSource() == vista.btnQuickSortTime){ modelo.ordenarQuickSortDuracion(); refrescarLista(); }
+            else if (e.getSource() == vista.btnMergeSortName){ modelo.ordenarMergeSortNombre();   refrescarLista(); }
+            else if (e.getSource() == vista.btnMergeSortTime){ modelo.ordenarMergeSortDuracion(); refrescarLista(); }
+            else if (e.getSource() == vista.btnBuscarRec)    { buscarRecomendacionesAsync(generoActual); }
+
         } catch (Exception ex) {
             JOptionPane.showMessageDialog(vista, "Error: " + ex.getMessage());
         }
     }
-    
-    //Método empleado para seleccionar el archivo, retorna la ruta como un string
-    public File seleccionarCarpeta () {
-        JFileChooser fileChooser = new JFileChooser();
-        
-        fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-        fileChooser.setAcceptAllFileFilterUsed(false);
-        
-        int seleccion = fileChooser.showOpenDialog(vista);
-        
-        if (seleccion == JFileChooser.APPROVE_OPTION) {
-            return fileChooser.getSelectedFile();
-        }
 
-        return null;
-    }
-
+    // ── Eventos de BasicPlayer ───────────────────────────────────
     @Override
     public void opened(Object source, Map properties) {
-    // Usamos un método seguro para obtener los datos
-    String titulo = obtenerPropiedad(properties, "title", "Desconocido");
-    String artista = obtenerPropiedad(properties, "author", "Desconocido");
-    String album = obtenerPropiedad(properties, "album", "Desconocido");
-    String genero = obtenerPropiedad(properties, "mp3.id3tag.genre", "Desconocido");
+        String titulo  = obtenerPropiedad(properties, "title",            "Desconocido");
+        String artista = obtenerPropiedad(properties, "author",           "Desconocido");
+        String album   = obtenerPropiedad(properties, "album",            "Desconocido");
+        String genero  = obtenerPropiedad(properties, "mp3.id3tag.genre", "Desconocido");
 
-    // Actualizamos la vista
-    vista.lblTitulo.setText("Título: " + titulo);
-    vista.lblArtista.setText("Artista: " + artista);
-    vista.lblAlbum.setText("Álbum: " + album);
-    vista.lblGenero.setText("Genero: " + genero);
-    
-    if (properties.containsKey("duration")) {
-        long microsegundos = Long.parseLong(properties.get("duration").toString());
-        
-        long segundosTotales = microsegundos / 1_000_000;
-        long minutos = segundosTotales / 60;
-        long segundos = segundosTotales % 60;
-        
-        
-        vista.lblDuracion.setText(
-            "Duración: " + String.format("%02d:%02d", minutos, segundos)
-        );
+        vista.lblTitulo.setText("Título: "  + titulo);
+        vista.lblArtista.setText("Artista: " + artista);
+        vista.lblAlbum.setText("Álbum: "    + album);
+        vista.lblGenero.setText("Genero: "  + genero);
 
-    }
-    
-    if (properties.containsKey("audio.length.bytes")) {
-        tamanoArchivo = Long.parseLong(properties.get("audio.length.bytes").toString());
-    }
-    
-    // Forzamos a la vista a reacomodarse si los textos son largos
-    vista.pack(); 
-}
-    @Override
-    public void progress(int bytesread, long microseconds, byte[] pcmdata, Map properties) {
-        // 1. Calcular porcentaje para la barra
-        if (tamanoArchivo > 0) {
-            float progreso = (bytesread * 100.0f) / tamanoArchivo;
-            vista.barraProgreso.setValue((int) progreso);
+        if (properties.containsKey("duration")) {
+            long ms  = Long.parseLong(properties.get("duration").toString());
+            long seg = ms / 1_000_000;
+            vista.lblDuracion.setText("Duración: " + String.format("%02d:%02d", seg / 60, seg % 60));
         }
 
-        // 2. Convertir microsegundos a Minutos:Segundos
-        long segundosTotales = microseconds / 1000000;
-        long minutos = segundosTotales / 60;
-        long segundos = segundosTotales % 60;
+        if (properties.containsKey("audio.length.bytes")) {
+            tamanoArchivo = Long.parseLong(properties.get("audio.length.bytes").toString());
+        }
 
-        // 3. Escribir el tiempo sobre la barra (ej: "02:45")
-        vista.barraProgreso.setString(String.format("%02d:%02d", minutos, segundos));
+        vista.pack();
+
+        // Búsqueda automática al cambiar de canción
+        generoActual = genero;
+        buscarRecomendacionesAsync(generoActual);
+    }
+
+    @Override
+    public void progress(int bytesread, long microseconds, byte[] pcmdata, Map properties) {
+        if (tamanoArchivo > 0) {
+            vista.barraProgreso.setValue((int)((bytesread * 100.0f) / tamanoArchivo));
+        }
+        long seg = microseconds / 1_000_000;
+        vista.barraProgreso.setString(String.format("%02d:%02d", seg / 60, seg % 60));
     }
 
     @Override
     public void stateUpdated(BasicPlayerEvent bpe) {
         if (bpe.getCode() == BasicPlayerEvent.STOPPED) {
             vista.barraProgreso.setValue(0);
+            estadoActual = Estado.stop;
+            vista.btnControl.setText("Reproducir");
         }
     }
 
     @Override
-    public void setController(BasicController bc) {
-        throw new UnsupportedOperationException(""); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    public void setController(BasicController bc) { }
+
+    // ── Búsqueda asíncrona (no bloquea la UI) ────────────────────
+    private void buscarRecomendacionesAsync(String genero) {
+
+        vista.limpiarRecomendaciones("Buscando: \"" + genero + "\"...");
+        vista.btnBuscarRec.setEnabled(false);
+
+        new SwingWorker<List<Recomendacion>, Void>() {
+
+            @Override
+            protected List<Recomendacion> doInBackground() {
+                return musicBrainz.buscarPorGenero(genero);
+            }
+
+            @Override
+            protected void done() {
+                try {
+                    List<Recomendacion> resultados = get();
+                    vista.limpiarRecomendaciones(
+                        resultados.isEmpty()
+                            ? "Sin resultados para: \"" + genero + "\""
+                            : resultados.size() + " resultado(s) para: \"" + genero + "\""
+                    );
+                    for (Recomendacion r : resultados) {
+                        vista.agregarRecomendacion(r.titulo, r.artista, r.album, r.generos);
+                    }
+                } catch (Exception ex) {
+                    vista.setEstadoBusqueda("Error: " + ex.getMessage());
+                } finally {
+                    vista.btnBuscarRec.setEnabled(true);
+                }
+            }
+        }.execute();
     }
-    
-    // Método auxiliar para evitar el "null"
+
+    // ── Auxiliares ───────────────────────────────────────────────
+    public File seleccionarCarpeta() {
+        JFileChooser fc = new JFileChooser();
+        fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+        fc.setAcceptAllFileFilterUsed(false);
+        return fc.showOpenDialog(vista) == JFileChooser.APPROVE_OPTION
+                ? fc.getSelectedFile() : null;
+    }
+
     private String obtenerPropiedad(Map props, String llave, String valorDefecto) {
         Object valor = props.get(llave);
         return (valor != null && !valor.toString().isEmpty()) ? valor.toString() : valorDefecto;
     }
-    
-    //Método para limpiar labels cuando se oprime detener
+
     public void limpiarLabels() {
         vista.lblTitulo.setText("Título: -");
         vista.lblArtista.setText("Artista: -");
@@ -218,12 +202,11 @@ public class Controlador implements ActionListener, BasicPlayerListener{
         vista.barraProgreso.setValue(0);
         vista.barraProgreso.setString("00:00");
     }
-    
+
     private void refrescarLista() {
-    vista.modeloLista.clear();
-    for (File f : modelo.obtenerCanciones()) {
-        vista.modeloLista.addElement(f.getName());
-        System.out.println(">> " + f.getName() + " | " + f.length() + " bytes"); // debug
+        vista.modeloLista.clear();
+        for (File f : modelo.obtenerCanciones()) {
+            vista.modeloLista.addElement(f.getName());
+        }
     }
-}
 }
